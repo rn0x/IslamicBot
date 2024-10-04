@@ -1,0 +1,35 @@
+{
+  "name": "ridha-alrahman-ghayati",
+  "version": "1.0.0",
+  "description": "A Telegram bot that offers various essential services for every Muslim in Arabic",
+  "main": "SRC/index.mjs",
+  "scripts": {
+    "start": "node src/index.mjs",
+    "dev": "nodemon src/index.mjs",
+    "DEBUG": "DEBUG=* node src/index.mjs",
+    "commit": "node scripts/autoCommit.mjs"
+  },
+  "keywords": [],
+  "author": {
+    "name": "Ryan Almalki",
+    "email": "rn0x.me@gmail.com",
+    "url": "https://github.com/rn0x/ridha-alrahman-ghayati"
+  },
+  "license": "MIT",
+  "nodemonConfig": {
+    "ignore": [
+      "src/translations",
+      "src/public",
+      "src/logs"
+    ]
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.7"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.3.0",
+    "dotenv": "^16.4.5",
+    "fs-extra": "^11.2.0",
+    "telegraf": "^4.16.3"
+  }
+}
