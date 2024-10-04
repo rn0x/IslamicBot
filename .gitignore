@@ -1,8 +1,12 @@
 # Logs
 logs
 *.log
+*.db
 package-lock.json
 node_modules/
 .env
 .temp
 .cache
+
+session.db
+database.db
