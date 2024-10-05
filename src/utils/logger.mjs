@@ -40,7 +40,7 @@ export const logError = (message, error = null) => {
   if (error) {
     logMessage += `Error Details: ${JSON.stringify(error, Object.getOwnPropertyNames(error))}\n`;
   }
-  console.log(logMessage);
+  console.error(logMessage);
   fs.appendFileSync(errorLogPath, logMessage);
 };
 
@@ -48,4 +48,5 @@ export const logError = (message, error = null) => {
 export const logInfo = (message) => {
   const logMessage = `[INFO] ${new Date().toISOString()} - ${message}\n`;
   fs.appendFileSync(infoLogPath, logMessage);
+  console.log(logMessage);
 };

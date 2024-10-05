@@ -1,4 +1,5 @@
 import Database from 'better-sqlite3';
+import { logError, logInfo } from "./logger.mjs";
 
 /**
  * SQLiteManager class for handling SQLite operations using better-sqlite3
@@ -10,10 +11,11 @@ class SQLiteManager {
      */
     constructor(dbPath) {
         try {
-            this.db = new Database(dbPath, { verbose: console.log });
-            console.log(`Database connected successfully at: ${dbPath}`);
+            // this.db = new Database(dbPath, { verbose: console.log });
+            this.db = new Database(dbPath);
+            logInfo(`Database connected successfully at: ${dbPath}`);
         } catch (error) {
-            console.error(`Failed to connect to database: ${error.message}`);
+            logError(`Failed to connect to database: ${error.message}`);
         }
     }
 
@@ -60,9 +62,9 @@ class SQLiteManager {
             // Execute the query
             this.db.prepare(createTableQuery).run();
 
-            console.log(`Table '${tableName}' created successfully.`);
+            logInfo(`Table '${tableName}' created successfully.`);
         } catch (error) {
-            console.error(`Failed to create table '${tableName}': ${error.message}`);
+            logError(`Failed to create table '${tableName}': ${error.message}`);
         }
     }
 
@@ -79,10 +81,10 @@ class SQLiteManager {
             const insertQuery = `INSERT INTO ${tableName} (${columns}) VALUES (${placeholders})`;
             const statement = this.db.prepare(insertQuery);
             const result = statement.run(...Object.values(data));
-            console.log(`Data inserted into '${tableName}' with row ID: ${result.lastInsertRowid}`);
+            logInfo(`Data inserted into '${tableName}' with row ID: ${result.lastInsertRowid}`);
             return result.lastInsertRowid;
         } catch (error) {
-            console.error(`Failed to insert data into '${tableName}': ${error.message}`);
+            logError(`Failed to insert data into '${tableName}': ${error.message}`);
             return null;
         }
     }
@@ -100,9 +102,9 @@ class SQLiteManager {
             const updateQuery = `UPDATE ${tableName} SET ${updates} WHERE ${conditions}`;
             const statement = this.db.prepare(updateQuery);
             const result = statement.run(...Object.values(data), ...Object.values(whereClause));
-            console.log(`Updated ${result.changes} row(s) in '${tableName}'`);
+            logInfo(`Updated ${result.changes} row(s) in '${tableName}'`);
         } catch (error) {
-            console.error(`Failed to update data in '${tableName}': ${error.message}`);
+            logError(`Failed to update data in '${tableName}': ${error.message}`);
         }
     }
 
@@ -117,9 +119,9 @@ class SQLiteManager {
             const deleteQuery = `DELETE FROM ${tableName} WHERE ${conditions}`;
             const statement = this.db.prepare(deleteQuery);
             const result = statement.run(...Object.values(whereClause));
-            console.log(`Deleted ${result.changes} row(s) from '${tableName}'`);
+            logInfo(`Deleted ${result.changes} row(s) from '${tableName}'`);
         } catch (error) {
-            console.error(`Failed to delete data from '${tableName}': ${error.message}`);
+            logError(`Failed to delete data from '${tableName}': ${error.message}`);
         }
     }
 
@@ -142,10 +144,10 @@ class SQLiteManager {
             const rows = conditions ?
                 statement.all(...Object.values(whereClause)) :
                 statement.all();
-            console.log(`Fetched ${rows.length} row(s) from '${tableName}'`);
+            logInfo(`Fetched ${rows.length} row(s) from '${tableName}'`);
             return rows;
         } catch (error) {
-            console.error(`Failed to fetch data from '${tableName}': ${error.message}`);
+            logError(`Failed to fetch data from '${tableName}': ${error.message}`);
             return [];
         }
     }
@@ -156,9 +158,9 @@ class SQLiteManager {
     close() {
         try {
             this.db.close();
-            console.log("Database connection closed.");
+            logInfo("Database connection closed.");
         } catch (error) {
-            console.error(`Failed to close the database: ${error.message}`);
+            logError(`Failed to close the database: ${error.message}`);
         }
     }
 }
