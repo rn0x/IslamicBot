@@ -22,6 +22,11 @@ export default function handleMyChatMember(client, tableManager, logger) {
                 if (insertResult.changes === 0) {
                     throw new Error(`Failed to insert user ${userId} into 'users'.`);
                 }
+                const message = ctx.from.username ?
+                    `مرحبا @${ctx.chat.username}، شكرًا لانضمامك!` :
+                    `مرحبا ${ctx.chat.title || ctx.chat.first_name || ctx.chat.last_name}، شكرًا لانضمامك!`;
+
+                await ctx.telegram.sendMessage(chatId, message);
                 logInfo(`User ${userId} has been inserted into 'users'.`);
             }
 
@@ -68,6 +73,10 @@ export default function handleMyChatMember(client, tableManager, logger) {
                 tableManager.dbManager.insertData('chat_members', memberData);
                 logInfo(`Membership for user ${userId} has been inserted into 'chat_members'.`);
             }
+
+            console.log(ctx);
+            console.log(status);
+
 
         } catch (error) {
             logError('An error occurred while handling membership:', error);
