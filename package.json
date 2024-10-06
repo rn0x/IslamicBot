@@ -19,8 +19,10 @@
   "nodemonConfig": {
     "ignore": [
       "src/translations",
-      "src/public",
-      "src/logs"
+      "node_modules",
+      "logs",
+      "database.db",
+      "session.db"
     ]
   },
   "devDependencies": {

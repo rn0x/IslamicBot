@@ -74,10 +74,6 @@ export default function handleMyChatMember(client, tableManager, logger) {
                 logInfo(`Membership for user ${userId} has been inserted into 'chat_members'.`);
             }
 
-            console.log(ctx);
-            console.log(status);
-
-
         } catch (error) {
             logError('An error occurred while handling membership:', error);
         }

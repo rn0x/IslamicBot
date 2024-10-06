@@ -9,6 +9,9 @@ import { logError, logInfo } from "./utils/logger.mjs";
 import TableManager from './utils/TableManager.mjs'
 import handleMyChatMember from './utils/handleMyChatMember.mjs'
 import stage from './scenes/index.mjs';
+import { setupActions } from './actions/index.mjs';
+import { setupEvents } from './events/index.mjs';
+import { setupCommands } from './commands/index.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -25,9 +28,6 @@ client.use(session());
 client.use(sqliteSessionMiddleware());
 client.use(stage.middleware());
 
-client.command('start', (ctx) => {
-    ctx.reply('Welcome to the bot!');
-});
 
 client.command('collect', (ctx) => {
     ctx.scene.enter('nameScene'); // الدخول إلى المشهد الأول
@@ -44,6 +44,15 @@ client.command('collect', (ctx) => {
 // وعند مغادرة المستخدم أو تغيير حالته (مثل الحذف)، يتم حذف سجله من قاعدة البيانات.
 // هذا يساعد في تتبع الأعضاء النشطين وتخزين معلومات دقيقة عن كل عضو في الدردشة.
 handleMyChatMember(client, tableManager, { logError, logInfo });
+
+// إعداد جميع الإجراءات الخاصة بالأزرار، مثل التعامل مع ضغطات الأزرار (callback queries) والردود المتفاعلة مع المستخدم
+setupActions(client);
+
+// إعداد جميع الأوامر المخصصة التي يمكن للمستخدمين استخدامها، مثل الأوامر /start و/help
+setupCommands(client, tableManager);
+
+// إعداد جميع الأحداث الخاصة بالبوت، مثل الاستماع للرسائل والنوعيات المختلفة من التحديثات (مثل الصور، الفيديو، الرسائل الصوتية، إلخ)
+setupEvents(client);
 
 client.catch((error) => {
     logError('An error occurred:', error); // سجل الخطأ

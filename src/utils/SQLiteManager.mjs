@@ -62,7 +62,7 @@ class SQLiteManager {
             // Execute the query
             this.db.prepare(createTableQuery).run();
 
-            logInfo(`Table '${tableName}' created successfully.`);
+            // logInfo(`Table '${tableName}' created successfully.`);
         } catch (error) {
             logError(`Failed to create table '${tableName}': ${error.message}`);
         }
@@ -81,7 +81,7 @@ class SQLiteManager {
             const insertQuery = `INSERT INTO ${tableName} (${columns}) VALUES (${placeholders})`;
             const statement = this.db.prepare(insertQuery);
             const result = statement.run(...Object.values(data));
-            logInfo(`Data inserted into '${tableName}' with row ID: ${result.lastInsertRowid}`);
+            // logInfo(`Data inserted into '${tableName}' with row ID: ${result.lastInsertRowid}`);
             return result.lastInsertRowid;
         } catch (error) {
             logError(`Failed to insert data into '${tableName}': ${error.message}`);
@@ -102,7 +102,7 @@ class SQLiteManager {
             const updateQuery = `UPDATE ${tableName} SET ${updates} WHERE ${conditions}`;
             const statement = this.db.prepare(updateQuery);
             const result = statement.run(...Object.values(data), ...Object.values(whereClause));
-            logInfo(`Updated ${result.changes} row(s) in '${tableName}'`);
+            // logInfo(`Updated ${result.changes} row(s) in '${tableName}'`);
         } catch (error) {
             logError(`Failed to update data in '${tableName}': ${error.message}`);
         }
@@ -119,7 +119,7 @@ class SQLiteManager {
             const deleteQuery = `DELETE FROM ${tableName} WHERE ${conditions}`;
             const statement = this.db.prepare(deleteQuery);
             const result = statement.run(...Object.values(whereClause));
-            logInfo(`Deleted ${result.changes} row(s) from '${tableName}'`);
+            // logInfo(`Deleted ${result.changes} row(s) from '${tableName}'`);
         } catch (error) {
             logError(`Failed to delete data from '${tableName}': ${error.message}`);
         }
@@ -144,11 +144,31 @@ class SQLiteManager {
             const rows = conditions ?
                 statement.all(...Object.values(whereClause)) :
                 statement.all();
-            logInfo(`Fetched ${rows.length} row(s) from '${tableName}'`);
+            // logInfo(`Fetched ${rows.length} row(s) from '${tableName}'`);
             return rows;
         } catch (error) {
             logError(`Failed to fetch data from '${tableName}': ${error.message}`);
             return [];
+        }
+    }
+
+    /**
+    * Get the count of records in a given table with an optional condition.
+    * @param {string} tableName - The name of the table to count records from.
+    * @param {string} [condition] - Optional condition for the count query.
+    * @returns {Promise<number>} - The count of records.
+    */
+    getCount(tableName, condition) {
+        try {
+            const query = condition ?
+                `SELECT COUNT(*) AS count FROM ${tableName} WHERE ${condition}` :
+                `SELECT COUNT(*) AS count FROM ${tableName}`;
+            const statement = this.db.prepare(query);
+            const result = statement.get(); // استخدم get() بدلاً من run() لجلب البيانات
+            return result.count || 0; // إرجاع العدد، إذا لم يكن موجودًا فالإرجاع 0
+        } catch (error) {
+            logError(`Failed to get count from '${tableName}': ${error.message}`);
+            return 0; // إرجاع 0 في حال حدوث خطأ
         }
     }
 
