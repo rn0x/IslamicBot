@@ -1,4 +1,4 @@
-export const helpCommand = async (client, tableManager) => {
+export function helpCommand(client, tableManager) {
     client.command('help', async (ctx) => {
         const message_id = ctx?.message?.message_id;
         const botName = process.env.BOT_NAME || 'البوت'; // استيراد اسم البوت من ملف .env، افتراضياً "البوت"

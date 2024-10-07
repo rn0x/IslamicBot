@@ -1,5 +1,6 @@
 import { startCommand } from './start.mjs';
-import { helpCommand } from './helpCommand.mjs';
+import { helpCommand } from './help.mjs';
+import { searchCommand } from './search.mjs'
 
 /**
  * إعداد جميع الأوامر الخاصة بالبوت
@@ -12,4 +13,5 @@ import { helpCommand } from './helpCommand.mjs';
 export function setupCommands(client, tableManager) {
     startCommand(client);
     helpCommand(client, tableManager);
+    searchCommand(client);
 }
