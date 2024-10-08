@@ -1,4 +1,6 @@
 import fs from 'fs-extra';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { Markup } from 'telegraf';
 
 /**
@@ -7,9 +9,11 @@ import { Markup } from 'telegraf';
  * @param {string} selectedLanguage - اللغة المختارة.
  */
 export async function selectReciter(ctx, selectedLanguage) {
-    const recitersData = await fs.readJson('src/data/QuranAudio.json');
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+    const recitersData = await fs.readJson(path.join(__dirname, '../data/QuranAudio.json'));
     const reciters = recitersData.filter(reciter => reciter.language === selectedLanguage);
-    const message_id = ctx?.message?.message_id
+    const message_id = ctx?.session?.message_id;
 
     if (reciters.length === 0) {
         await ctx.reply('عذرًا، لا يوجد قراء متاحين لهذه اللغة.', { parse_mode: 'Markdown', reply_to_message_id: message_id });

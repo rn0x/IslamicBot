@@ -17,11 +17,11 @@ export function searchCommand(client) {
         try {
             // البحث عن الآيات باستخدام معالج البحث
             const ayahs = await searchAyah(keyword);
-            const verseKey = ayahs.verseKey;
-            const [surahNumber, ayahNumber] = verseKey.split(':').map(Number);            
+            const verseKey = ayahs?.verseKey;            
 
             if (verseKey) {
-                await ctx.reply(`تم العثور على الآية رقم ${ayahNumber} من سورة رقم ${surahNumber}. اختر لغة:`, { parse_mode: 'Markdown', reply_to_message_id: message_id });
+                const [surahNumber, ayahNumber] = verseKey.split(':').map(Number);
+                // await ctx.reply(`تم العثور على الآية رقم ${ayahNumber} من سورة رقم ${surahNumber}. اختر لغة:`, { parse_mode: 'Markdown', reply_to_message_id: message_id });
                 // عرض اللغات المتاحة
                 const languages = ['ar', 'en', 'fr']; // قائمة اللغات المتاحة
                 await ctx.reply('يرجى اختيار لغة:', {

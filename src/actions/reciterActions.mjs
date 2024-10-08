@@ -1,11 +1,17 @@
-import fetch from 'node-fetch';  // استيراد مكتبة node-fetch
+import fetch from 'node-fetch';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { logError } from '../utils/logger.mjs';
+import { Markup } from 'telegraf';
 
 /**
  * إعداد الأحداث الخاصة باختيار القارئ.
  * @param {object} client - عميل Telegraf.
  */
 export function setupReciterActions(client) {
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+
     client.action(/reciter_(.+)/, async (ctx) => {
         const selectedReciter = ctx.match[1];
         ctx.session.selectedReciter = selectedReciter;
@@ -47,8 +53,10 @@ export function setupReciterActions(client) {
 
                 // تنسيق النص ليظهر اسم السورة ورقم الآية
                 const formattedText = `📖 *${surahName}* \n🔢 رقم الآية: *${ayahNumber}* \n\nالآية: ${currentAyah.text}`;
+                const but_1 = [Markup.button.callback('📜 عرض التفسير', `get_tafseer_${surahNumber}:${ayahNumber}`)]
+                const buttons = Markup.inlineKeyboard([but_1]).reply_markup;
 
-                await ctx.reply(formattedText, { parse_mode: 'Markdown', reply_to_message_id: message_id });  // إرسال النص المنسق
+                await ctx.reply(formattedText, { parse_mode: 'Markdown', reply_to_message_id: message_id, reply_markup: buttons });  // إرسال النص المنسق
                 await ctx.replyWithAudio({ url: currentAyah.audio }, { reply_to_message_id: message_id });  // إرسال صوت الآية
             } else {
                 await ctx.reply(`لم يتم العثور على الآية رقم ${ayahNumber} في السورة رقم ${surahNumber}.`, { parse_mode: 'Markdown', reply_to_message_id: message_id });

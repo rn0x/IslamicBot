@@ -28,7 +28,7 @@ export async function processAyahSearch(ctx) {
         const ayah = await searchAyah(keyword);
 
         if (ayah) {
-            const { verseKey, verseText, highlightedWords } = ayah;
+            const { verseKey, verseText } = ayah;
             const [surahNumber, ayahNumber] = verseKey.split(':').map(Number);
             const defaultReciter = "ar.saoodshuraym";
             const response = await fetch(`https://api.alquran.cloud/v1/quran/${defaultReciter}`);
@@ -52,12 +52,17 @@ export async function processAyahSearch(ctx) {
             }
 
             // تنسيق رسالة تحتوي على نص الآية ورقمها واسم السورة
-            const formattedMessage = `
-✨ *الآية رقم ${ayahNumber} من ${surah.name}* ✨
-📜 ${verseText}`;
+            const formattedMessage = `📖 *${surah.name}* \n🔢 رقم الآية: *${ayahNumber}* \n\nالآية: ${verseText}`;
 
+            // إضافة زر "التفسير"
+            const but_1 = [Markup.button.callback('📜 عرض التفسير', `get_tafseer_${surahNumber}:${ayahNumber}`)]
+            const buttons = Markup.inlineKeyboard([but_1]).reply_markup;
             // إرسال الرسالة المنسقة
-            await sendMessageInChunks(ctx, formattedMessage, { parse_mode: 'Markdown', reply_to_message_id: message_id });
+            await sendMessageInChunks(ctx, formattedMessage, {
+                parse_mode: 'Markdown',
+                reply_to_message_id: message_id,
+                reply_markup: buttons
+            });
 
             // إرسال الصوت عبر الرابط مباشرةً
             const audioUrl = currentAyah.audio;
