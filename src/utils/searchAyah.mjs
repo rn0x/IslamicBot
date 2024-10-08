@@ -9,7 +9,6 @@ import { logError } from './logger.mjs';
 export async function searchAyah(query) {
     // التأكد من أن النص المدخل ليس فارغًا
     if (!query) {
-        console.error('لا يمكن أن يكون النص المدخل فارغًا.');
         return null;
     }
 

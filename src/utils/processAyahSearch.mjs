@@ -1,6 +1,7 @@
 import { searchAyah } from './searchAyah.mjs';
 import { Markup } from 'telegraf';
 import sendMessageInChunks from './sendMessageInChunks.mjs';
+import { logError } from './logger.mjs';
 
 /**
  * معالجة النص الوارد والبحث عن الآيات بناءً على الكلمة المفتاحية.
@@ -76,7 +77,7 @@ export async function processAyahSearch(ctx) {
         }
     } catch (error) {
         // معالجة الأخطاء بشكل أكثر تفصيلاً
-        console.error(error);
+        logError('حدث خطأ أثناء البحث عن الآيات.', error);
         await ctx.reply('حدث خطأ أثناء البحث عن الآيات.', { parse_mode: 'Markdown', reply_to_message_id: message_id });
     }
 }

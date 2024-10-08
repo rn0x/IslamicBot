@@ -2,6 +2,7 @@ import fs from 'fs-extra';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { processAyahSearch } from '../utils/processAyahSearch.mjs';
+import processHadithSearch from '../utils/processHadithSearch.mjs';
 
 /**
  * إعداد الأحداث الخاصة باستقبال النصوص (TEXT).
@@ -14,5 +15,6 @@ export function setupTextEvents(client) {
     client.on('text', async (ctx) => {
         // استدعاء دالة معالجة البحث عن آية
         await processAyahSearch(ctx);
+        await processHadithSearch(ctx);
     });
 }

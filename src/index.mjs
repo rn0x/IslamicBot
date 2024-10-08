@@ -20,8 +20,6 @@ const __dirname = path.dirname(__filename);
 const dbPath = path.join(__dirname, '../database.db');
 const tableManager = new TableManager(dbPath);  // تهيئة الجداول عند بدء البوت
 
-
-
 const client = new Telegraf(process.env.TELEGRAM_TOKEN);
 
 client.use(session());

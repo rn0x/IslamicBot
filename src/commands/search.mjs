@@ -1,3 +1,4 @@
+import { logError } from '../utils/logger.mjs';
 import { searchAyah } from '../utils/searchAyah.mjs';
 import { Markup } from 'telegraf';
 
@@ -47,7 +48,7 @@ export function searchCommand(client) {
             } else {
                 ctx.reply('حدث خطأ أثناء البحث عن الآيات.', { parse_mode: 'Markdown', reply_to_message_id: message_id });
             }
-            console.error(error);
+            logError(error);
         }
     });
 }
