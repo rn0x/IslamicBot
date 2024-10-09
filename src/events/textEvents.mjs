@@ -3,6 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { processAyahSearch } from '../utils/processAyahSearch.mjs';
 import processHadithSearch from '../utils/processHadithSearch.mjs';
+import processFatwaSearch from '../utils/processFatwaSearch.mjs';
 
 /**
  * إعداد الأحداث الخاصة باستقبال النصوص (TEXT).
@@ -16,5 +17,6 @@ export function setupTextEvents(client) {
         // استدعاء دالة معالجة البحث عن آية
         await processAyahSearch(ctx);
         await processHadithSearch(ctx);
+        await processFatwaSearch(ctx);
     });
 }

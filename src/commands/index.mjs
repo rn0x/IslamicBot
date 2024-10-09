@@ -2,6 +2,7 @@ import { startCommand } from './start.mjs';
 import { helpCommand } from './help.mjs';
 import { searchCommand } from './search.mjs'
 import searchHadithCommand from './hadith.mjs';
+import searchFatwaCommand from './fatwa.mjs';
 
 /**
  * إعداد جميع الأوامر الخاصة بالبوت
@@ -16,4 +17,5 @@ export function setupCommands(client, tableManager) {
     helpCommand(client, tableManager);
     searchCommand(client);
     searchHadithCommand(client);
+    searchFatwaCommand(client);
 }

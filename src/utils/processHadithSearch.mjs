@@ -27,6 +27,8 @@ export default async function processHadithSearch(ctx) {
         return await ctx.reply('يرجى إدخال كلمة للبحث عنها في الأحاديث النبوية بعد "حديث".', { parse_mode: 'Markdown', reply_to_message_id: message_id });
     }
 
+    const waitingMessage = await ctx.reply('🔍 جاري البحث عن الحديث يرجى الانتظار...', { reply_to_message_id: message_id });
+
     if (useApi) {
         try {
             // البحث باستخدام API
@@ -37,24 +39,24 @@ export default async function processHadithSearch(ctx) {
                 searchApiResult.slice(0, 1).forEach(async (hadith) => {
                     const rawHadithText = convertHtmlToText(hadith.text);
                     const formattedMessage = `
-        🌟 *الكتاب:* ${hadith.book} 🌟
+🌟 *الكتاب:* ${hadith.book} 🌟
     
-        📖 *النص:*
-        ${rawHadithText}
+📖 *النص:*
+${rawHadithText}
     
-        📂 *الفصل:* ${hadith.chapter || 'غير متوفر'}
-        📑 *الصفحة:* ${hadith.page || 'غير متوفر'}
-        📚 *المجلد:* ${hadith.volume || 'غير متوفر'}
+📂 *الفصل:* ${hadith.chapter || 'غير متوفر'}
+📑 *الصفحة:* ${hadith.page || 'غير متوفر'}
+📚 *المجلد:* ${hadith.volume || 'غير متوفر'}
     
-        👥 *الرواة:* ${hadith.narrators.map(n => `${n.name} (${n.is_companion ? 'صحابي' : 'غير صحابي'})`).join(', ')}
+👥 *الرواة:* ${hadith.narrators.map(n => `${n.name} (${n.is_companion ? 'صحابي' : 'غير صحابي'})`).join(', ')}
     
-        ⚖ *الأحكام الشرعية:* ${hadith.rulings.length > 0
+⚖ *الأحكام الشرعية:* ${hadith.rulings.length > 0
                             ? hadith.rulings.map(r => `الحكم: ${r.ruling} - ${r.scholar} (${r.book})`).join('\n')
                             : 'لا يوجد أحكام مرفقة'
                         }
     
-        🌐 *الموقع المنصة الحديثية*:
-        [alminasa.ai](https://alminasa.ai/contact)`;
+🌐 *الموقع المنصة الحديثية*:
+[alminasa.ai](https://alminasa.ai/contact)`;
 
                     await sendMessageInChunks(ctx, formattedMessage, {
                         parse_mode: 'Markdown',
@@ -62,6 +64,12 @@ export default async function processHadithSearch(ctx) {
                         disable_web_page_preview: true
                     });
                 });
+
+                try {
+                    await ctx.deleteMessage(waitingMessage.message_id);
+                } catch (deleteError) {
+                    logError('خطأ أثناء محاولة حذف الرسالة: ربما لا توجد صلاحية حذف.', deleteError);
+                }
                 return; // الخروج بعد إرسال النتيجة
             }
 
@@ -92,6 +100,12 @@ export default async function processHadithSearch(ctx) {
                         reply_to_message_id: message_id,
                     });
                 });
+
+                try {
+                    await ctx.deleteMessage(waitingMessage.message_id);
+                } catch (deleteError) {
+                    logError('خطأ أثناء محاولة حذف الرسالة: ربما لا توجد صلاحية حذف.', deleteError);
+                }
                 return; // الخروج بعد إرسال النتيجة
             }
         } catch (error) {

@@ -6,56 +6,67 @@ export default function searchHadithCommand(client) {
     client.command('hadith', async (ctx) => {
         const message_id = ctx?.message?.message_id;
         const query = ctx.message.text.split(' ').slice(1).join(' ').trim();
-        
+        const useApi = true; // لإستعمال api الخاص بالمنصة الحديثية 
+
+
         if (!query) {
             return await ctx.reply('يرجى إدخال كلمة للبحث عنها في الأحاديث النبوية بعد "/hadith".', { parse_mode: 'Markdown', reply_to_message_id: message_id });
         }
 
-        try {
-            // البحث باستخدام API
-            const searchApiResult = await searchHadithApi(query);
+        const waitingMessage = await ctx.reply('🔍 جاري البحث عن الحديث يرجى الانتظار...', { reply_to_message_id: message_id });
 
-            if (searchApiResult.length > 0) {
-                // إذا تم العثور على نتائج من الـ API، إرسال النتيجة
-                searchApiResult.slice(0, 1).forEach(async (hadith) => {
-                    const formattedMessage = `
+        if (useApi) {
+            try {
+                // البحث باستخدام API
+                const searchApiResult = await searchHadithApi(query);
+
+                if (searchApiResult.length > 0) {
+                    // إذا تم العثور على نتائج من الـ API، إرسال النتيجة
+                    searchApiResult.slice(0, 1).forEach(async (hadith) => {
+                        const formattedMessage = `
 🌟 *الكتاب:* ${hadith.book} 🌟
-                    
+                        
 📖 *النص:*
 ${hadith.text}
-
+    
 📂 *الفصل:* ${hadith.chapter || 'غير متوفر'}
 📑 *الصفحة:* ${hadith.page || 'غير متوفر'}
 📚 *المجلد:* ${hadith.volume || 'غير متوفر'}
-
+    
 👥 *الرواة:* ${hadith.narrators.map(n => `${n.name} (${n.is_companion ? 'صحابي' : 'غير صحابي'})`).join(', ')}
-
-⚖ *الأحكام الشرعية:* ${
-    hadith.rulings.length > 0
-    ? hadith.rulings.map(r => `الحكم: ${r.ruling} - ${r.scholar} (${r.book})`).join('\n')
-    : 'لا يوجد أحكام مرفقة'
-}
-
+    
+⚖ *الأحكام الشرعية:* ${hadith.rulings.length > 0
+                                ? hadith.rulings.map(r => `الحكم: ${r.ruling} - ${r.scholar} (${r.book})`).join('\n')
+                                : 'لا يوجد أحكام مرفقة'
+                            }
+    
 🌐 *الموقع المنصة الحديثية*:
 [alminasa.ai](https://alminasa.ai/contact)`;
 
-                    await sendMessageInChunks(ctx, formattedMessage, {
-                        parse_mode: 'Markdown',
-                        reply_to_message_id: message_id,
-                        disable_web_page_preview: true
+                        await sendMessageInChunks(ctx, formattedMessage, {
+                            parse_mode: 'Markdown',
+                            reply_to_message_id: message_id,
+                            disable_web_page_preview: true
+                        });
                     });
-                });
-                return; // الخروج بعد إرسال النتيجة
-            }
 
-        } catch (error) {
-            await ctx.reply('حدث خطأ أثناء البحث في API.', { parse_mode: 'Markdown', reply_to_message_id: message_id });
-            console.error('API search error:', error);
+                    try {
+                        await ctx.deleteMessage(waitingMessage.message_id);
+                    } catch (deleteError) {
+                        logError('خطأ أثناء محاولة حذف الرسالة: ربما لا توجد صلاحية حذف.', deleteError);
+                    }
+                    return; // الخروج بعد إرسال النتيجة
+                }
+
+            } catch (error) {
+                await ctx.reply('حدث خطأ أثناء البحث في API.', { parse_mode: 'Markdown', reply_to_message_id: message_id });
+                console.error('API search error:', error);
+            }
         }
 
         // إذا لم تكن هناك نتائج من الـ API، البحث في المصادر التقليدية
         const sources = ['bukhari', 'muslim', 'abudawud'];
-        
+
         for (let i = 0; i < sources.length; i++) {
             try {
                 const searchResult = await searchHadith(query, sources[i]);
@@ -76,6 +87,12 @@ ${result.narrator}\n${result.textEnglish}`;
                             reply_to_message_id: message_id,
                         });
                     });
+
+                    try {
+                        await ctx.deleteMessage(waitingMessage.message_id);
+                    } catch (deleteError) {
+                        logError('خطأ أثناء محاولة حذف الرسالة: ربما لا توجد صلاحية حذف.', deleteError);
+                    }
                     return; // الخروج بعد إرسال النتيجة
                 }
             } catch (error) {
