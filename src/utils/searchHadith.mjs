@@ -7,11 +7,11 @@ import { logError } from './logger.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-// خيارات Fuse.js
+
 const fuseOptions = {
-    keys: ['textArabic', 'textEnglish'], // الحقول التي سيتم البحث فيها
+    keys: ['textArabic'], // الحقول التي سيتم البحث فيها ['textArabic', 'textEnglish']
     threshold: 0.3, // درجة الغموض في البحث (قيمة أقل = أكثر دقة)
-    distance: 100, // مسافة البحث الغامض
+    distance: 50, // مسافة البحث الغامض
     ignoreLocation: true, // تجاهل موقع الكلمة في النص
     tokenize: true, // تقسيم النص إلى كلمات
     minMatchCharLength: 2, // الحد الأدنى لأحرف المطابقة
@@ -20,41 +20,44 @@ const fuseOptions = {
 const hadithCache = {};
 
 const hadithSources = ['bukhari', 'muslim', 'abudawud'];
+
+// تحميل البيانات وإنشاء كائن Fuse.js لكل مصدر
 for (const source of hadithSources) {
     try {
         const filePath = path.join(__dirname, `../data/hadith/${source}.json`);
         const data = await fs.readJSON(filePath);
-        hadithCache[source] = data;
+
+        // إنشاء كائن Fuse.js مرة واحدة لكل مصدر
+        hadithCache[source] = {
+            fuse: new Fuse(
+                data.hadiths.map((hadith, id) => ({
+                    id,
+                    metadata: data.metadata,
+                    idInBook: hadith.idInBook,
+                    chapterId: hadith.chapterId,
+                    bookId: hadith.bookId,
+                    narrator: hadith.english.narrator,
+                    textArabic: removeMarkdownSymbols(removeDiacritics(hadith.arabic || "")), // إزالة التشكيل
+                    textEnglish: removeMarkdownSymbols(hadith.english.text) || "", // النص الإنجليزي كما هو
+                })),
+                fuseOptions
+            ),
+        };
     } catch (error) {
         logError(`خطأ في تحميل بيانات ${source}:`, error);
     }
 }
 
-console.log("تم تحميل البينات");
-
-
-
 // دالة البحث في الأحاديث
 export async function searchHadith(query, source) {
-    const data = hadithCache[source];
-    const fuse = new Fuse(
-        data.hadiths.map((hadith, id) => ({
-            id,
-            metadata: data.metadata,
-            idInBook: hadith.idInBook,
-            chapterId: hadith.chapterId,
-            bookId: hadith.bookId,
-            narrator: hadith.english.narrator,
-            textArabic: removeDiacritics(hadith.arabic || ""), // إزالة التشكيل
-            textEnglish: hadith.english.text || "", // النص الإنجليزي كما هو
-        })),
-        fuseOptions
-    );
+    const cachedData = hadithCache[source];
 
-    if (!fuse) {
+    if (!cachedData) {
         logError("يجب تحميل البيانات أولاً.");
         return [];
     }
+
+    const fuse = cachedData.fuse;
 
     // إزالة التشكيل من الاستعلام لتطابق أفضل مع النصوص
     const searchTerm = removeDiacritics(query);
@@ -68,4 +71,16 @@ export async function searchHadith(query, source) {
 
     // إرجاع النتائج
     return results.map(result => result.item);
+}
+
+
+/**
+ * إزالة الرموز الخاصة من نص Markdown.
+ * @param {string} text - النص الذي يحتوي على الرموز الخاصة.
+ * @returns {string} - النص بدون رموز Markdown.
+ */
+function removeMarkdownSymbols(text) {
+    return text
+        .replace(/[_*`~]/g, '') // إزالة الرموز _ * ` ~
+        .replace(/(?:\[\[(.*?)\]\])/g, '$1'); // إزالة العلامات الخاصة الأخرى إذا كانت موجودة
 }

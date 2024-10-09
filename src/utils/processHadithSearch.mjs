@@ -33,27 +33,26 @@ export default async function processHadithSearch(ctx) {
         if (searchApiResult.length > 0) {
             // إذا تم العثور على نتائج من الـ API، إرسال النتيجة
             searchApiResult.slice(0, 1).forEach(async (hadith) => {
-                const rawHadithText = convertHtmlToText(hadith.text); 
+                const rawHadithText = convertHtmlToText(hadith.text);
                 const formattedMessage = `
-🌟 *الكتاب:* ${hadith.book} 🌟
-                
-📖 *النص:*
-${rawHadithText}
+    🌟 *الكتاب:* ${hadith.book} 🌟
 
-📂 *الفصل:* ${hadith.chapter || 'غير متوفر'}
-📑 *الصفحة:* ${hadith.page || 'غير متوفر'}
-📚 *المجلد:* ${hadith.volume || 'غير متوفر'}
+    📖 *النص:*
+    ${rawHadithText}
 
-👥 *الرواة:* ${hadith.narrators.map(n => `${n.name} (${n.is_companion ? 'صحابي' : 'غير صحابي'})`).join(', ')}
+    📂 *الفصل:* ${hadith.chapter || 'غير متوفر'}
+    📑 *الصفحة:* ${hadith.page || 'غير متوفر'}
+    📚 *المجلد:* ${hadith.volume || 'غير متوفر'}
 
-⚖ *الأحكام الشرعية:* ${
-    hadith.rulings.length > 0
-    ? hadith.rulings.map(r => `الحكم: ${r.ruling} - ${r.scholar} (${r.book})`).join('\n')
-    : 'لا يوجد أحكام مرفقة'
-}
+    👥 *الرواة:* ${hadith.narrators.map(n => `${n.name} (${n.is_companion ? 'صحابي' : 'غير صحابي'})`).join(', ')}
 
-🌐 *الموقع المنصة الحديثية*:
-[alminasa.ai](https://alminasa.ai/contact)`;
+    ⚖ *الأحكام الشرعية:* ${hadith.rulings.length > 0
+                        ? hadith.rulings.map(r => `الحكم: ${r.ruling} - ${r.scholar} (${r.book})`).join('\n')
+                        : 'لا يوجد أحكام مرفقة'
+                    }
+
+    🌐 *الموقع المنصة الحديثية*:
+    [alminasa.ai](https://alminasa.ai/contact)`;
 
                 await sendMessageInChunks(ctx, formattedMessage, {
                     parse_mode: 'Markdown',
@@ -71,21 +70,19 @@ ${rawHadithText}
 
     // إذا لم تكن هناك نتائج من الـ API، البحث في المصادر التقليدية
     const sources = ['bukhari', 'muslim', 'abudawud'];
-    
+
     for (let i = 0; i < sources.length; i++) {
         try {
             const searchResult = await searchHadith(keyword, sources[i]);
+
             if (searchResult.length > 0) {
                 // إذا تم العثور على نتائج في أي مصدر، أرسل النتيجة وأخرج من الحلقة
                 searchResult.slice(0, 1).forEach(async result => {
-                    const formattedMessage = `
-🌟 ${result.metadata.arabic.title} (${result.metadata.english.title}) 🌟
-                                    
-📖 *الحديث (عربي):*
-${result.textArabic}
-                        
-🌐 *الحديث (إنجليزي):*
-${result.narrator}\n${result.textEnglish}`;
+                    let formattedMessage = `🌟 ${result.metadata.arabic.title} (${result.metadata.english.title}) 🌟\n\n`;
+                    formattedMessage += '📖 *الحديث (عربي):* \n'
+                    formattedMessage += `${result.textArabic} \n\n`
+                    formattedMessage += '🌐 *الحديث (إنجليزي):* \n'
+                    formattedMessage += `${result.narrator}\n${result.textEnglish} `;
 
                     await sendMessageInChunks(ctx, formattedMessage, {
                         parse_mode: 'Markdown',
