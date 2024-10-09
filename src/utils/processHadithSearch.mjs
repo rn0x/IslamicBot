@@ -12,6 +12,7 @@ import convertHtmlToText from './convertHtmlToText.mjs';
 export default async function processHadithSearch(ctx) {
     const message_id = ctx?.message?.message_id;
     const messageText = ctx.message.text.trim();
+    const useApi = true; // لإستعمال api الخاص بالمنصة الحديثية 
 
     // التحقق مما إذا كانت النص يبدأ بكلمة "حديث "
     if (!messageText.startsWith("حديث")) {
@@ -26,46 +27,48 @@ export default async function processHadithSearch(ctx) {
         return await ctx.reply('يرجى إدخال كلمة للبحث عنها في الأحاديث النبوية بعد "حديث".', { parse_mode: 'Markdown', reply_to_message_id: message_id });
     }
 
-    try {
-        // البحث باستخدام API
-        const searchApiResult = await searchHadithApi(keyword);
+    if (useApi) {
+        try {
+            // البحث باستخدام API
+            const searchApiResult = await searchHadithApi(keyword);
 
-        if (searchApiResult.length > 0) {
-            // إذا تم العثور على نتائج من الـ API، إرسال النتيجة
-            searchApiResult.slice(0, 1).forEach(async (hadith) => {
-                const rawHadithText = convertHtmlToText(hadith.text);
-                const formattedMessage = `
-    🌟 *الكتاب:* ${hadith.book} 🌟
+            if (searchApiResult.length > 0) {
+                // إذا تم العثور على نتائج من الـ API، إرسال النتيجة
+                searchApiResult.slice(0, 1).forEach(async (hadith) => {
+                    const rawHadithText = convertHtmlToText(hadith.text);
+                    const formattedMessage = `
+        🌟 *الكتاب:* ${hadith.book} 🌟
+    
+        📖 *النص:*
+        ${rawHadithText}
+    
+        📂 *الفصل:* ${hadith.chapter || 'غير متوفر'}
+        📑 *الصفحة:* ${hadith.page || 'غير متوفر'}
+        📚 *المجلد:* ${hadith.volume || 'غير متوفر'}
+    
+        👥 *الرواة:* ${hadith.narrators.map(n => `${n.name} (${n.is_companion ? 'صحابي' : 'غير صحابي'})`).join(', ')}
+    
+        ⚖ *الأحكام الشرعية:* ${hadith.rulings.length > 0
+                            ? hadith.rulings.map(r => `الحكم: ${r.ruling} - ${r.scholar} (${r.book})`).join('\n')
+                            : 'لا يوجد أحكام مرفقة'
+                        }
+    
+        🌐 *الموقع المنصة الحديثية*:
+        [alminasa.ai](https://alminasa.ai/contact)`;
 
-    📖 *النص:*
-    ${rawHadithText}
-
-    📂 *الفصل:* ${hadith.chapter || 'غير متوفر'}
-    📑 *الصفحة:* ${hadith.page || 'غير متوفر'}
-    📚 *المجلد:* ${hadith.volume || 'غير متوفر'}
-
-    👥 *الرواة:* ${hadith.narrators.map(n => `${n.name} (${n.is_companion ? 'صحابي' : 'غير صحابي'})`).join(', ')}
-
-    ⚖ *الأحكام الشرعية:* ${hadith.rulings.length > 0
-                        ? hadith.rulings.map(r => `الحكم: ${r.ruling} - ${r.scholar} (${r.book})`).join('\n')
-                        : 'لا يوجد أحكام مرفقة'
-                    }
-
-    🌐 *الموقع المنصة الحديثية*:
-    [alminasa.ai](https://alminasa.ai/contact)`;
-
-                await sendMessageInChunks(ctx, formattedMessage, {
-                    parse_mode: 'Markdown',
-                    reply_to_message_id: message_id,
-                    disable_web_page_preview: true
+                    await sendMessageInChunks(ctx, formattedMessage, {
+                        parse_mode: 'Markdown',
+                        reply_to_message_id: message_id,
+                        disable_web_page_preview: true
+                    });
                 });
-            });
-            return; // الخروج بعد إرسال النتيجة
-        }
+                return; // الخروج بعد إرسال النتيجة
+            }
 
-    } catch (error) {
-        await ctx.reply('حدث خطأ أثناء البحث عن الحديث في الـ API.', { parse_mode: 'Markdown', reply_to_message_id: message_id });
-        logError('حدث خطأ أثناء البحث في الـ API.', error);
+        } catch (error) {
+            await ctx.reply('حدث خطأ أثناء البحث عن الحديث في الـ API.', { parse_mode: 'Markdown', reply_to_message_id: message_id });
+            logError('حدث خطأ أثناء البحث في الـ API.', error);
+        }
     }
 
     // إذا لم تكن هناك نتائج من الـ API، البحث في المصادر التقليدية

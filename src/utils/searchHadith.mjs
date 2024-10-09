@@ -37,8 +37,8 @@ for (const source of hadithSources) {
                     chapterId: hadith.chapterId,
                     bookId: hadith.bookId,
                     narrator: hadith.english.narrator,
-                    textArabic: removeMarkdownSymbols(removeDiacritics(hadith.arabic || "")), // إزالة التشكيل
-                    textEnglish: removeMarkdownSymbols(hadith.english.text) || "", // النص الإنجليزي كما هو
+                    textArabic: removeMarkdownSymbols(removeDiacritics(hadith.arabic || "")),
+                    textEnglish: removeMarkdownSymbols(hadith.english.text) || "", 
                 })),
                 fuseOptions
             ),
