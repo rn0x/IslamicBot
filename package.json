@@ -1,5 +1,5 @@
 {
-  "name": "ridha-alrahman-ghayati",
+  "name": "islamicbot",
   "version": "1.0.0",
   "description": "A Telegram bot that offers various essential services for every Muslim in Arabic",
   "main": "SRC/index.mjs",
@@ -13,7 +13,7 @@
   "author": {
     "name": "Ryan Almalki",
     "email": "rn0x.me@gmail.com",
-    "url": "https://github.com/rn0x/ridha-alrahman-ghayati"
+    "url": "https://github.com/rn0x/IslamicBot"
   },
   "license": "MIT",
   "nodemonConfig": {
@@ -34,6 +34,7 @@
     "fs-extra": "^11.2.0",
     "fuse.js": "^7.0.0",
     "html-to-text": "^9.0.5",
+    "node-html-to-image": "^5.0.0",
     "telegraf": "^4.16.3"
   }
 }

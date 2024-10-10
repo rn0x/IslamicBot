@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const dbSessionPath = path.join(__dirname, '../../session.db');
+const dbSessionPath = path.join(__dirname, '../../database/session.db');
 const sessionManager = new SQLiteSessionManager(dbSessionPath);
 export default function sqliteSessionMiddleware() {
     return (ctx, next) => {

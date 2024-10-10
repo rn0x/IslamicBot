@@ -32,6 +32,7 @@ for (const source of hadithSources) {
             fuse: new Fuse(
                 data.hadiths.map((hadith, id) => ({
                     id,
+                    source: source,
                     metadata: data.metadata,
                     idInBook: hadith.idInBook,
                     chapterId: hadith.chapterId,

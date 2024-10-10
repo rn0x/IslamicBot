@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { setupLanguageActions } from './languageActions.mjs';
 import { setupReciterActions } from './reciterActions.mjs';
 import { tafseerActions } from './tafseerActions.mjs'
+import HadithActions from './HadithActions.mjs';
 
 /**
  * إعداد جميع الأكشن الخاصة بالبوت
@@ -16,4 +17,5 @@ export function setupActions(client) {
     setupLanguageActions(client);   // إعداد أحداث اختيار اللغة
     setupReciterActions(client);    // إعداد أحداث اختيار القارئ
     tafseerActions(client, tafseerMouaser); // زر التفسير الميسر
+    HadithActions(client);    // زر الحديث - صانع الصور
 }

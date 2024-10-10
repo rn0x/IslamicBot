@@ -17,7 +17,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // إنشاء مدير الجداول وتحديد مسار قاعدة البيانات
-const dbPath = path.join(__dirname, '../database.db');
+const dbPath = path.join(__dirname, '../database/database.db');
 const tableManager = new TableManager(dbPath);  // تهيئة الجداول عند بدء البوت
 
 const client = new Telegraf(process.env.TELEGRAM_TOKEN);

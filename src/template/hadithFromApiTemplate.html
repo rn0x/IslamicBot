@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ar">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📖 {{book}} - {{chapter}}</title>
+    <style>
+        /* تصميم جديد وحديث مع ألوان جذابة */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            direction: rtl;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 50px auto;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 32px;
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        .hadith-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 0 20px;
+        }
+
+        .hadith-info p {
+            font-size: 18px;
+            color: #7f8c8d;
+        }
+
+        .hadith-text {
+            background-color: #ecf0f1;
+            padding: 25px;
+            border-radius: 10px;
+            line-height: 1.8;
+            font-size: 20px;
+            margin-bottom: 30px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .footer p {
+            font-size: 14px;
+            color: #95a5a6;
+        }
+
+        .footer a {
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        .footer .bot-details {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #bdc3c7;
+        }
+
+        .footer .bot-details strong {
+            color: #7f8c8d;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 30px auto;
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 28px;
+            }
+
+            .hadith-text {
+                font-size: 18px;
+            }
+
+            .hadith-info p {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>📖 {{book}} - {{chapter}}</h1>
+
+        <div class="hadith-info">
+            <p>الرواة: <strong>{{narrators}}</strong></p>
+        </div>
+
+        <div class="hadith-text">
+            <p>{{text}}</p>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>🤖 مقدم بواسطة: <strong>{{name_bot}}</strong> <span dir="ltr" style="color: #ff6868;">(@{{username_bot}})</span></p>
+    </div>
+</body>
+
+</html>

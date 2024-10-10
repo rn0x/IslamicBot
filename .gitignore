@@ -7,6 +7,5 @@ node_modules/
 .env
 .temp
 .cache
-
-session.db
-database.db
+database/session.db
+database/database.db

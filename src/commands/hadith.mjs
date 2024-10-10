@@ -1,12 +1,15 @@
+import { Markup } from 'telegraf';
+
 import { searchHadithApi } from '../utils/searchHadithApi.mjs';
 import { searchHadith } from '../utils/searchHadith.mjs';
 import sendMessageInChunks from '../utils/sendMessageInChunks.mjs';
+import { logError } from '../utils/logger.mjs';
 
 export default function searchHadithCommand(client) {
     client.command('hadith', async (ctx) => {
         const message_id = ctx?.message?.message_id;
         const query = ctx.message.text.split(' ').slice(1).join(' ').trim();
-        const useApi = true; // لإستعمال api الخاص بالمنصة الحديثية 
+        const useApi = process.env.USE_HADITH_API.toLowerCase() === 'true';
 
 
         if (!query) {
@@ -23,6 +26,8 @@ export default function searchHadithCommand(client) {
                 if (searchApiResult.length > 0) {
                     // إذا تم العثور على نتائج من الـ API، إرسال النتيجة
                     searchApiResult.slice(0, 1).forEach(async (hadith) => {
+                        const but_1 = [Markup.button.callback('📷 تحويل إلى صورة', `get_hadith_api:${hadith.hadith_id}`)]
+                        const buttons = Markup.inlineKeyboard([but_1]).reply_markup;
                         const formattedMessage = `
 🌟 *الكتاب:* ${hadith.book} 🌟
                         
@@ -46,7 +51,8 @@ ${hadith.text}
                         await sendMessageInChunks(ctx, formattedMessage, {
                             parse_mode: 'Markdown',
                             reply_to_message_id: message_id,
-                            disable_web_page_preview: true
+                            disable_web_page_preview: true,
+                            reply_markup: buttons
                         });
                     });
 
@@ -60,7 +66,7 @@ ${hadith.text}
 
             } catch (error) {
                 await ctx.reply('حدث خطأ أثناء البحث في API.', { parse_mode: 'Markdown', reply_to_message_id: message_id });
-                console.error('API search error:', error);
+                logError('API search error:', error);
             }
         }
 
@@ -73,6 +79,8 @@ ${hadith.text}
                 if (searchResult.length > 0) {
                     // إذا تم العثور على نتائج في أي مصدر، أرسل النتيجة وأخرج من الحلقة
                     searchResult.slice(0, 1).forEach(async result => {
+                        const but_1 = [Markup.button.callback('📷 تحويل إلى صورة', `get_hadith:${result.source}:${result.id}`)]
+                        const buttons = Markup.inlineKeyboard([but_1]).reply_markup;
                         const formattedMessage = `
 🌟 ${result.metadata.arabic.title} (${result.metadata.english.title}) 🌟
                             
@@ -85,6 +93,7 @@ ${result.narrator}\n${result.textEnglish}`;
                         await sendMessageInChunks(ctx, formattedMessage, {
                             parse_mode: 'Markdown',
                             reply_to_message_id: message_id,
+                            reply_markup: buttons
                         });
                     });
 
@@ -97,7 +106,7 @@ ${result.narrator}\n${result.textEnglish}`;
                 }
             } catch (error) {
                 await ctx.reply('حدث خطأ أثناء البحث عن الحديث.', { parse_mode: 'Markdown', reply_to_message_id: message_id });
-                console.error('Traditional search error:', error);
+                logError('Traditional search error:', error);
             }
         }
 

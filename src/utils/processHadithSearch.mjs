@@ -12,7 +12,7 @@ import convertHtmlToText from './convertHtmlToText.mjs';
 export default async function processHadithSearch(ctx) {
     const message_id = ctx?.message?.message_id;
     const messageText = ctx.message.text.trim();
-    const useApi = true; // لإستعمال api الخاص بالمنصة الحديثية 
+    const useApi = process.env.USE_HADITH_API.toLowerCase() === 'true';
 
     // التحقق مما إذا كانت النص يبدأ بكلمة "حديث "
     if (!messageText.startsWith("حديث")) {
@@ -37,6 +37,9 @@ export default async function processHadithSearch(ctx) {
             if (searchApiResult.length > 0) {
                 // إذا تم العثور على نتائج من الـ API، إرسال النتيجة
                 searchApiResult.slice(0, 1).forEach(async (hadith) => {
+                    const but_1 = [Markup.button.callback('📷 تحويل إلى صورة', `get_hadith_api:${hadith.hadith_id}`)]
+                    const buttons = Markup.inlineKeyboard([but_1]).reply_markup;
+
                     const rawHadithText = convertHtmlToText(hadith.text);
                     const formattedMessage = `
 🌟 *الكتاب:* ${hadith.book} 🌟
@@ -61,7 +64,8 @@ ${rawHadithText}
                     await sendMessageInChunks(ctx, formattedMessage, {
                         parse_mode: 'Markdown',
                         reply_to_message_id: message_id,
-                        disable_web_page_preview: true
+                        disable_web_page_preview: true,
+                        reply_markup: buttons
                     });
                 });
 
@@ -89,6 +93,10 @@ ${rawHadithText}
             if (searchResult.length > 0) {
                 // إذا تم العثور على نتائج في أي مصدر، أرسل النتيجة وأخرج من الحلقة
                 searchResult.slice(0, 1).forEach(async result => {
+                    
+                    const but_1 = [Markup.button.callback('📷 تحويل إلى صورة', `get_hadith:${result.source}:${result.id}`)]
+                    const buttons = Markup.inlineKeyboard([but_1]).reply_markup;
+
                     let formattedMessage = `🌟 ${result.metadata.arabic.title} (${result.metadata.english.title}) 🌟\n\n`;
                     formattedMessage += '📖 *الحديث (عربي):* \n'
                     formattedMessage += `${result.textArabic} \n\n`
@@ -98,6 +106,7 @@ ${rawHadithText}
                     await sendMessageInChunks(ctx, formattedMessage, {
                         parse_mode: 'Markdown',
                         reply_to_message_id: message_id,
+                        reply_markup: buttons
                     });
                 });
 

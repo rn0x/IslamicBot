@@ -1,3 +1,4 @@
+import { logError } from '../utils/logger.mjs';
 import { searchFatwa } from '../utils/searchFatwa.mjs';
 import sendMessageInChunks from '../utils/sendMessageInChunks.mjs';
 
@@ -49,14 +50,14 @@ ${result.answer}
             }
         } catch (error) {
             await ctx.reply('حدث خطأ أثناء البحث عن الفتوى.', { parse_mode: 'Markdown', reply_to_message_id: message_id });
-            console.error('Fatwa search error:', error);
+            logError('Fatwa search error:', error);
         }
 
         // محاولة حذف رسالة "جاري البحث" إذا كان لديه الصلاحية
         try {
             await ctx.deleteMessage(waitingMessage.message_id);
         } catch (deleteError) {
-            console.error('خطأ أثناء محاولة حذف الرسالة: ربما لا توجد صلاحية حذف.', deleteError);
+            logError('خطأ أثناء محاولة حذف الرسالة: ربما لا توجد صلاحية حذف.', deleteError);
             // يمكن إرسال رسالة توضيحية أو تجاهل الخطأ بدون أي إجراء إضافي
         }
     });
