@@ -18,7 +18,7 @@ export async function fetchImageFromSnapshot({ htmlTemplate, data = {} }) {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                htmlTemplate: htmlTemplate, 
+                htmlTemplate: htmlTemplate,
                 data: data,
             }),
         });
@@ -35,8 +35,7 @@ export async function fetchImageFromSnapshot({ htmlTemplate, data = {} }) {
             throw new Error('Image not found in the response');
         }
 
-        const imageBuffer = Buffer.from(json.image, 'base64');
-        return imageBuffer;
+        return json.image;
 
     } catch (error) {
         console.error('Error fetching image:', error);

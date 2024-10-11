@@ -88,14 +88,18 @@ async function handleHadithImage(ctx, data, usernameBot, useApi) {
     }
 
     try {
-        const imageBuffer = await fetchImageFromSnapshot({
+
+        const base64Image = await fetchImageFromSnapshot({
             htmlTemplate,
-            data: htmlData,
-            options: {
-                type: 'jpeg',
-                quality: 90
-            }
+            data: htmlData
         });
+
+        // إزالة الترويسة (prefix) إذا كانت موجودة
+        const base64Data = base64Image.replace(/^data:image\/\w+;base64,/, '');
+
+        // تحويل Base64 إلى Buffer
+        const imageBuffer = Buffer.from(base64Data, 'base64');
+
         await ctx.replyWithPhoto({ source: imageBuffer }, { caption: `` });
     } catch (error) {
         logError('Error while generating image:', error);
@@ -123,13 +127,13 @@ function generateHtmlTemplate(useApi) {
 function generateHtmlData(data, usernameBot, useApi) {
     const botName = process.env.BOT_NAME || 'البوت';
 
-    const fontPath = path.join(__dirname, "../template/fonts/Rubik-Regular.ttf");
-    const font_rubik = fs.readFileSync(fontPath);
-    const font_rubik_base64 = font_rubik.toString('base64'); // تحويل الخط إلى Base64
-    const font_rubik_uri = `data:font/truetype;base64,${font_rubik_base64}`; // إنشاء Data URI
+    // const fontPath = path.join(__dirname, "../template/fonts/Rubik-Regular.ttf");
+    // const font_rubik = fs.readFileSync(fontPath);
+    // const font_rubik_base64 = font_rubik.toString('base64'); // تحويل الخط إلى Base64
+    // const font_rubik_uri = `data:font/truetype;base64,${font_rubik_base64}`; // إنشاء Data URI
+
     if (useApi) {
         return {
-            font_rubik: font_rubik_uri,
             name_bot: botName,
             username_bot: usernameBot,
             book: data.hadith_book_name || '',
@@ -141,7 +145,6 @@ function generateHtmlData(data, usernameBot, useApi) {
         };
     } else {
         return {
-            font_rubik: font_rubik_uri,
             name_bot: botName,
             username_bot: usernameBot,
             author: data.metadata.arabic.author,
