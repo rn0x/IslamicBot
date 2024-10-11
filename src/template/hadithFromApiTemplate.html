@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>📖 {{book}} - {{chapter}}</title>
     <style>
+        @import url('{{font_rubik}}');
+
         /* تصميم جديد وحديث مع ألوان جذابة */
         * {
             margin: 0;
@@ -14,7 +16,7 @@
         }
 
         body {
-            font-family: 'Tajawal', sans-serif;
+            font-family: "Rubik", sans-serif;
             background-color: #f0f2f5;
             color: #333;
             direction: rtl;
@@ -125,7 +127,8 @@
     </div>
 
     <div class="footer">
-        <p>🤖 مقدم بواسطة: <strong>{{name_bot}}</strong> <span dir="ltr" style="color: #ff6868;">(@{{username_bot}})</span></p>
+        <p>🤖 مقدم بواسطة: <strong>{{name_bot}}</strong> <span dir="ltr"
+                style="color: #ff6868;">(@{{username_bot}})</span></p>
     </div>
 </body>
 

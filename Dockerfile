@@ -4,20 +4,6 @@ FROM node:20-alpine
 # إعداد المتغيرات البيئية للتأكد من عدم تشغيل البوت بامتيازات الجذر
 ENV NODE_ENV=production
 
-# تثبيت الحزم اللازمة لتشغيل Chromium
-RUN apk add --no-cache \
-    chromium \
-    nss \
-    freetype \
-    harfbuzz \
-    ca-certificates \
-    ttf-freefont \
-    nodejs \
-    yarn
-
-# إعداد متغير بيئي لمسار كروميوم
-ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
-
 # تعيين مجلد العمل إلى جذر المشروع
 WORKDIR /app
 

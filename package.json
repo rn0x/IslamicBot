@@ -34,7 +34,6 @@
     "fs-extra": "^11.2.0",
     "fuse.js": "^7.0.0",
     "html-to-text": "^9.0.5",
-    "node-html-to-image": "^5.0.0",
     "telegraf": "^4.16.3"
   }
 }

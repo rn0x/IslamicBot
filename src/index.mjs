@@ -34,6 +34,9 @@ client.command('collect', (ctx) => {
 client.on('new_chat_members', async (ctx) => {
     console.log(ctx);
 });
+client.on('left_chat_member', async (ctx) => {
+    console.log(ctx);
+});
 
 
 // هذه الفقرة تتعامل مع حدث my_chat_member لإدارة تغييرات عضوية المستخدمين في الدردشة.

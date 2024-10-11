@@ -1,4 +1,4 @@
-import { generateImageFromHtml } from '../utils/generateImageFromHtml.mjs';
+import { fetchImageFromSnapshot } from '../utils/fetchImageFromSnapshot.mjs';
 import { Markup } from 'telegraf';
 import fetch from 'node-fetch';
 import fs from 'fs-extra';
@@ -78,7 +78,7 @@ function extractId(callbackData, prefix) {
 // وظيفة مساعدة لتحويل الحديث إلى صورة وإرسالها
 async function handleHadithImage(ctx, data, usernameBot, useApi) {
     const htmlTemplate = generateHtmlTemplate(useApi);
-    const htmlData = generateHtmlData(data, usernameBot, useApi);    
+    const htmlData = generateHtmlData(data, usernameBot, useApi);
 
     // تحقق إذا كان القالب غير معرّف أو فارغ
     if (!htmlTemplate || htmlTemplate.trim() === '') {
@@ -88,7 +88,14 @@ async function handleHadithImage(ctx, data, usernameBot, useApi) {
     }
 
     try {
-        const imageBuffer = await generateImageFromHtml({ htmlTemplate, data: htmlData });
+        const imageBuffer = await fetchImageFromSnapshot({
+            htmlTemplate,
+            data: htmlData,
+            options: {
+                type: 'jpeg',
+                quality: 90
+            }
+        });
         await ctx.replyWithPhoto({ source: imageBuffer }, { caption: `` });
     } catch (error) {
         logError('Error while generating image:', error);
@@ -113,10 +120,16 @@ function generateHtmlTemplate(useApi) {
 }
 
 // دالة مساعدة لتوليد HTML Data
-function generateHtmlData(data, usernameBot, useApi) {    
+function generateHtmlData(data, usernameBot, useApi) {
     const botName = process.env.BOT_NAME || 'البوت';
+
+    const fontPath = path.join(__dirname, "../template/fonts/Rubik-Regular.ttf");
+    const font_rubik = fs.readFileSync(fontPath);
+    const font_rubik_base64 = font_rubik.toString('base64'); // تحويل الخط إلى Base64
+    const font_rubik_uri = `data:font/truetype;base64,${font_rubik_base64}`; // إنشاء Data URI
     if (useApi) {
         return {
+            font_rubik: font_rubik_uri,
             name_bot: botName,
             username_bot: usernameBot,
             book: data.hadith_book_name || '',
@@ -128,6 +141,7 @@ function generateHtmlData(data, usernameBot, useApi) {
         };
     } else {
         return {
+            font_rubik: font_rubik_uri,
             name_bot: botName,
             username_bot: usernameBot,
             author: data.metadata.arabic.author,
