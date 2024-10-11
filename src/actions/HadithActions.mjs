@@ -79,6 +79,7 @@ function extractId(callbackData, prefix) {
 async function handleHadithImage(ctx, data, usernameBot, useApi) {
     const htmlTemplate = generateHtmlTemplate(useApi);
     const htmlData = generateHtmlData(data, usernameBot, useApi);
+    const message_id = ctx.callbackQuery.message.message_id;
 
     // تحقق إذا كان القالب غير معرّف أو فارغ
     if (!htmlTemplate || htmlTemplate.trim() === '') {
@@ -88,6 +89,8 @@ async function handleHadithImage(ctx, data, usernameBot, useApi) {
     }
 
     try {
+
+        const waitingMessage = await ctx.reply('🖼️ جاري إنشاء الصورة، يرجى الانتظار قليلاً...', { reply_to_message_id: message_id });
 
         const base64Image = await fetchImageFromSnapshot({
             htmlTemplate,
@@ -100,6 +103,11 @@ async function handleHadithImage(ctx, data, usernameBot, useApi) {
         // تحويل Base64 إلى Buffer
         const imageBuffer = Buffer.from(base64Data, 'base64');
 
+        try {
+            await ctx.deleteMessage(waitingMessage.message_id);
+        } catch (deleteError) {
+            logError('خطأ أثناء محاولة حذف الرسالة: ربما لا توجد صلاحية حذف.', deleteError);
+        }
         await ctx.replyWithPhoto({ source: imageBuffer }, { caption: `` });
     } catch (error) {
         logError('Error while generating image:', error);
