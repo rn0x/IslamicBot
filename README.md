@@ -19,7 +19,6 @@ npm install
 ```
 BOT_TOKEN=توكين_البوت_هنا
 BOT_NAME=اسم_البوت_هنا
-PUPPETEER_EXECUTABLE_PATH=مسار متصفح chromium او chrom
 ```
 
 ## تشغيل البوت 🚀
