@@ -1,7 +1,7 @@
 import { searchAyah } from './searchAyah.mjs';
 import { Markup } from 'telegraf';
 import sendMessageInChunks from './sendMessageInChunks.mjs';
-import { logError } from './logger.mjs';
+import { logError, logInfo } from './logger.mjs';
 
 /**
  * معالجة النص الوارد والبحث عن الآيات بناءً على الكلمة المفتاحية.
@@ -37,7 +37,7 @@ export async function processAyahSearch(ctx) {
 
             // تحقق من حالة الاستجابة
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                logInfo(`HTTP error! status: ${response.status}`);
             }
 
             const surah = data.data.surahs.find(s => s.number === surahNumber);

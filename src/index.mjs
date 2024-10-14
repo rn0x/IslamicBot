@@ -7,7 +7,6 @@ import { fileURLToPath } from 'node:url';
 import sqliteSessionMiddleware from './middlewares/sqliteSessionMiddleware.mjs';
 import { logError, logInfo } from "./utils/logger.mjs";
 import TableManager from './utils/TableManager.mjs'
-import handleMyChatMember from './utils/handleMyChatMember.mjs'
 import stage from './scenes/index.mjs';
 import { setupActions } from './actions/index.mjs';
 import { setupEvents } from './events/index.mjs';
@@ -32,19 +31,12 @@ client.command('collect', (ctx) => {
 });
 
 client.on('new_chat_members', async (ctx) => {
-    console.log(ctx);
+    // console.log(ctx);
 });
 client.on('left_chat_member', async (ctx) => {
-    console.log(ctx);
+    // console.log(ctx);
 });
 
-
-// هذه الفقرة تتعامل مع حدث my_chat_member لإدارة تغييرات عضوية المستخدمين في الدردشة.
-// يتم استخدام TableManager لتسجيل معلومات الأعضاء الجدد أو تحديث حالة الأعضاء الذين غادروا.
-// عند انضمام مستخدم جديد، يتم إضافة سجله إلى قاعدة البيانات.
-// وعند مغادرة المستخدم أو تغيير حالته (مثل الحذف)، يتم حذف سجله من قاعدة البيانات.
-// هذا يساعد في تتبع الأعضاء النشطين وتخزين معلومات دقيقة عن كل عضو في الدردشة.
-handleMyChatMember(client, tableManager, { logError, logInfo });
 
 // إعداد جميع الإجراءات الخاصة بالأزرار، مثل التعامل مع ضغطات الأزرار (callback queries) والردود المتفاعلة مع المستخدم
 setupActions(client);
@@ -53,7 +45,7 @@ setupActions(client);
 setupCommands(client, tableManager);
 
 // إعداد جميع الأحداث الخاصة بالبوت، مثل الاستماع للرسائل والنوعيات المختلفة من التحديثات (مثل الصور، الفيديو، الرسائل الصوتية، إلخ)
-setupEvents(client);
+setupEvents(client, tableManager);
 
 client.catch((error) => {
     logError('An error occurred:', error); // سجل الخطأ

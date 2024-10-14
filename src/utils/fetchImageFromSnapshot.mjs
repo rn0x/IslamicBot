@@ -1,5 +1,5 @@
 import fetch from 'node-fetch';
-import { logError } from './logger.mjs';
+import { logError, logInfo } from './logger.mjs';
 
 /**
  * وظيفة جلب صورة من خدمة HTML Snapshot.
@@ -25,21 +25,19 @@ export async function fetchImageFromSnapshot({ htmlTemplate, data = {} }) {
 
         // تحقق من استجابة الطلب
         if (!response.ok) {
-            throw new Error(`Error fetching image: ${response.statusText}`);
+            logInfo(`Error fetching image: ${response.statusText}`);
         }
 
         // جلب الصورة كـ base64
         const json = await response.json();
 
         if (!json.image) {
-            throw new Error('Image not found in the response');
+            logInfo('Image not found in the response');
         }
 
         return json.image;
 
     } catch (error) {
-        console.error('Error fetching image:', error);
         logError('Error fetching image:', error);
-        throw new Error('حدث خطأ أثناء جلب الصورة من الخدمة الخارجية');
     }
 }

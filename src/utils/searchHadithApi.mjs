@@ -1,5 +1,5 @@
 import fetch from 'node-fetch';
-import { logError } from './logger.mjs';
+import { logError, logInfo } from './logger.mjs';
 
 /**
  * Search for Hadith using a word or phrase.
@@ -15,7 +15,7 @@ export async function searchHadithApi(query) {
     
     // Check if the response is successful
     if (!response.ok) {
-      throw new Error(`API request failed with status ${response.status}`);
+      logInfo(`API request failed with status ${response.status}`);
     }
 
     // Parse the JSON data

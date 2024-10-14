@@ -1,7 +1,7 @@
 import fetch from 'node-fetch';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { logError } from '../utils/logger.mjs';
+import { logError, logInfo } from '../utils/logger.mjs';
 import { Markup } from 'telegraf';
 
 /**
@@ -31,7 +31,7 @@ export function setupReciterActions(client) {
 
             // التحقق من حالة الاستجابة
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                logInfo(`HTTP error! status: ${response.status}`);
             }
 
             const verseKey = ayahs.verseKey;

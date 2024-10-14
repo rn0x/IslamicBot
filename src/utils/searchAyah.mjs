@@ -1,5 +1,5 @@
 import fetch from 'node-fetch';
-import { logError } from './logger.mjs';
+import { logError, logInfo } from './logger.mjs';
 
 /**
  * دالة للبحث عن آية في القرآن باستخدام API من quran.com.
@@ -20,7 +20,7 @@ export async function searchAyah(query) {
 
         // تحقق من حالة الاستجابة
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            logInfo(`HTTP error! status: ${response.status}`);
         }
 
         // تحويل الاستجابة إلى JSON
