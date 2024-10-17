@@ -1,6 +1,7 @@
 import { setupTextEvents } from './textEvents.mjs';
 import { logError, logInfo } from "../utils/logger.mjs";
 import handleMyChatMember from './handleMyChatMember.mjs'
+import channelPost from './channelPost.mjs';
 
 
 /**
@@ -16,5 +17,7 @@ export function setupEvents(client, tableManager) {
     // هذا يساعد في تتبع الأعضاء النشطين وتخزين معلومات دقيقة عن كل عضو في الدردشة.
     client.on('my_chat_member', async (ctx) => handleMyChatMember(ctx, tableManager));
 
-    client.on('text', async (ctx) => setupTextEvents(ctx));
+    client.on('text', async (ctx) => setupTextEvents(ctx, tableManager));
+
+    client.on('channel_post', async (ctx) => channelPost(ctx, tableManager));
 }
