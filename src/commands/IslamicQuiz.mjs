@@ -18,43 +18,48 @@ export default function IslamicQuiz(client) {
         }
     };
 
+    // دالة لاختيار عنصر عشوائي من مصفوفة
+    const getRandomElement = (array) => array[Math.floor(Math.random() * array.length)];
+
     // دالة لاختيار عدد معين من الأسئلة عشوائيًا
-    const getRandomQuestions = (questions, count) => {
-        return questions.sort(() => Math.random() - 0.5).slice(0, count);
-    };
+    const getRandomQuestions = (questions, count) =>
+        questions.sort(() => Math.random() - 0.5).slice(0, count);
 
     // دالة لترتيب الإجابات بشكل عشوائي
-    const shuffleAnswers = (answers) => {
-        return answers.sort(() => Math.random() - 0.5);
-    };
+    const shuffleAnswers = (answers) =>
+        answers.sort(() => Math.random() - 0.5);
 
     // دالة لاختصار النص إذا كان طوله أكبر من 100 حرف
-    const truncateText = (text, maxLength = 100) => {
-        return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
-    };
+    const truncateText = (text, maxLength = 100) =>
+        text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
 
     client.command('quiz', async (ctx) => {
         try {
             const data = await loadData();
-            const tafseerQuestions = data.mainCategories.find(cat => cat.arabicName === 'التفسير').topics[0].levelsData.level1;
 
-            // اختيار سؤال عشوائي من القسم المطلوب
-            const randomQuestions = getRandomQuestions(tafseerQuestions, 1);
-            const question = randomQuestions[0];
+            const randomCategory = getRandomElement(data.mainCategories);
+            const randomTopic = getRandomElement(randomCategory.topics);
+            const levels = Object.keys(randomTopic.levelsData);
+            const randomLevel = getRandomElement(levels);
 
-            // ترتيب الإجابات بشكل عشوائي
+            const questions = randomTopic.levelsData[randomLevel];
+            const [question] = getRandomQuestions(questions, 1);
+
             const shuffledAnswers = shuffleAnswers(question.answers);
 
-            // العثور على الإجابة الصحيحة بعد الترتيب
+            const truncatedAnswers = shuffledAnswers.map(ans =>
+                truncateText(ans.answer, 100) // اختصار كل إجابة لتكون أقل من 100 حرف
+            );
+
             const correctOptionId = shuffledAnswers.findIndex(ans => ans.t === 1);
 
-            // تجهيز النص المختصر للإجابة الصحيحة
-            const explanation = truncateText(`الإجابة الصحيحة هي ✔️: \n${shuffledAnswers[correctOptionId].answer}`);
+            const explanation = truncateText(
+                `الإجابة الصحيحة هي ✔️: \n${shuffledAnswers[correctOptionId].answer}`
+            );
 
-            // إرسال الاستطلاع عبر Telegraf
             await ctx.replyWithPoll(
                 question.q,
-                shuffledAnswers.map(ans => ans.answer),
+                truncatedAnswers,
                 {
                     is_anonymous: true,
                     allows_multiple_answers: false,
