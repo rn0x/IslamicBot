@@ -4,6 +4,7 @@ import { searchCommand } from './search.mjs'
 import searchHadithCommand from './hadith.mjs';
 import searchFatwaCommand from './fatwa.mjs';
 import searchKhutbahCommand from './khutbah.mjs'
+import IslamicQuiz from './IslamicQuiz.mjs';
 
 /**
  * إعداد جميع الأوامر الخاصة بالبوت
@@ -20,4 +21,5 @@ export function setupCommands(client, tableManager) {
     searchHadithCommand(client);
     searchFatwaCommand(client);
     searchKhutbahCommand(client);
+    IslamicQuiz(client);
 }

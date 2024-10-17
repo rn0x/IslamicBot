@@ -8,7 +8,7 @@ const dbSessionPath = path.join(__dirname, '../../database/session.db');
 const sessionManager = new SQLiteSessionManager(dbSessionPath);
 export default function sqliteSessionMiddleware() {
     return (ctx, next) => {
-        const sessionKey = `${ctx.chat.id}:${ctx.from.id}`; 
+        const sessionKey = `${ctx?.chat?.id}:${ctx?.from?.id}`; 
         ctx.session = sessionManager.get(sessionKey) || {};
         return next().then(() => {
             sessionManager.set(sessionKey, ctx.session);
